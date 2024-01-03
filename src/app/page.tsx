@@ -1,15 +1,15 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import ClipLoader from "react-spinners/ClipLoader";
 
-const SERVER_URL = "https://cdd3-80-115-239-91.ngrok-free.app";
+const SERVER_URL = "http://localhost:8000";
 
 export default function Home() {
-  const [commitUrl, setCommitUrl] = useState('');
+  const [commitUrl, setCommitUrl] = useState("");
   const [commitSignature, setCommitSignature] = useState({
-    message: '',
-    signature: '',
+    message: "",
+    signature: "",
   });
   const [isProofLoading, setIsProofLoading] = useState(false); // added state for loading
   const [proof, setProof] = useState("");
@@ -25,16 +25,19 @@ export default function Home() {
 
     const response = await fetch(apiUrl);
     const jsonData = await response.json();
-    setCommitSignature({ message: jsonData.commit.verification.payload, signature: jsonData.commit.verification.signature });
-  }
+    setCommitSignature({
+      message: jsonData.commit.verification.payload,
+      signature: jsonData.commit.verification.signature,
+    });
+  };
 
   const generateProof = async () => {
     setIsProofLoading(true);
     try {
       const response = await fetch(`${SERVER_URL}/generate-proof`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ssh_sig: commitSignature.signature,
@@ -48,14 +51,14 @@ export default function Home() {
       setProof("");
     }
     setIsProofLoading(false);
-  }
+  };
 
   const verifyProof = async () => {
     try {
       const response = await fetch(`${SERVER_URL}/verify-proof`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           proof,
@@ -67,22 +70,24 @@ export default function Home() {
       console.error(e);
       setIsProofValid(false);
     }
-  }
+  };
 
   useEffect(() => {
     setIsProofValid(null);
   }, [proof]);
 
   return (
-    <div className="h-screen container mx-auto p-8">
-      <h1 className="text-center font-bold text-2xl mb-4">Halo2 ed25519 Github Signature Verification</h1>
+    <div className="container mx-auto h-screen p-8">
+      <h1 className="mb-4 text-center text-2xl font-bold">
+        Halo2 ed25519 Github Signature Verification
+      </h1>
       <div className="mb-4">
-        <label className="block text-sm font-bold mb-2" htmlFor="commitUrl">
+        <label className="mb-2 block text-sm font-bold" htmlFor="commitUrl">
           Github Commit URL
         </label>
         <div className="flex">
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
             id="commitUrl"
             type="text"
             placeholder="Github Commit URL"
@@ -90,7 +95,7 @@ export default function Home() {
             onChange={(e) => setCommitUrl(e.target.value)}
           />
           <button
-            className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="focus:shadow-outline ml-2 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
             onClick={() => loadCommitFromUrl(commitUrl)}
           >
             Load
@@ -98,33 +103,46 @@ export default function Home() {
         </div>
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-bold mb-2" htmlFor="signature">
+        <label className="mb-2 block text-sm font-bold" htmlFor="signature">
           Signature
         </label>
         <textarea
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
           id="signature"
           rows={8}
           value={commitSignature.signature}
-          onChange={(e) => setCommitSignature(prev => ({ ...prev, signature: e.target.value }))}
+          onChange={(e) =>
+            setCommitSignature((prev) => ({
+              ...prev,
+              signature: e.target.value,
+            }))
+          }
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-bold mb-2" htmlFor="message">
+        <label className="mb-2 block text-sm font-bold" htmlFor="message">
           Message
         </label>
         <textarea
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
           id="message"
           rows={8}
           value={commitSignature.message}
-          onChange={(e) => setCommitSignature(prev => ({ ...prev, message: e.target.value }))}
+          onChange={(e) =>
+            setCommitSignature((prev) => ({ ...prev, message: e.target.value }))
+          }
         />
       </div>
 
-      <div className="flex flex-row items-center mb-4">
+      <div className="mb-4 flex flex-row items-center">
         <button
-          className={clsx("w-48 h-12 bg-green-500 text-white font-bold py-2 px-4 mr-4 rounded focus:outline-none focus:shadow-outline", {"hover:bg-green-700": !isProofLoading, "cursor-not-allowed": isProofLoading})}
+          className={clsx(
+            "focus:shadow-outline mr-4 h-12 w-48 rounded bg-green-500 px-4 py-2 font-bold text-white focus:outline-none",
+            {
+              "hover:bg-green-700": !isProofLoading,
+              "cursor-not-allowed": isProofLoading,
+            },
+          )}
           onClick={generateProof}
           disabled={isProofLoading}
         >
@@ -140,11 +158,11 @@ export default function Home() {
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-bold mb-2" htmlFor="message">
+        <label className="mb-2 block text-sm font-bold" htmlFor="message">
           Proof
         </label>
         <textarea
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
           id="message"
           rows={8}
           value={proof}
@@ -153,14 +171,16 @@ export default function Home() {
       </div>
 
       <button
-        className="w-48 h-12 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        className="focus:shadow-outline h-12 w-48 rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-700 focus:outline-none"
         onClick={verifyProof}
       >
         Verify Proof
       </button>
-      {isProofValid !== null && (<span className="ml-4">
-        {isProofValid ? "Passed! ✅" : "Failed! ❌"}
-      </span>)}
+      {isProofValid !== null && (
+        <span className="ml-4">
+          {isProofValid ? "Passed! ✅" : "Failed! ❌"}
+        </span>
+      )}
     </div>
-  )
+  );
 }
